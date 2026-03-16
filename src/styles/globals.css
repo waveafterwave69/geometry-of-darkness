@@ -1,0 +1,41 @@
+a,
+button,
+label,
+input,
+textarea,
+select,
+svg * {
+    transition-duration: var(--transition-duration);
+}
+
+body {
+    font-family: var(--main-font);
+    background: url('../img/bg.png');
+    color: var(--color-light);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--title-font);
+}
+
+.container {
+    max-width: var(--container-width);
+    padding: 0 var(--container-padding-x);
+    margin: 0 auto;
+}
+
+:focus-visible,
+a:focus-visible {
+    outline: auto;
+}
+
+@media (max-width: 500px) {
+    .container {
+        padding: 0 var(--container-padding-mobile-x);
+    }
+}
