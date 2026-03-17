@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import track from '../audio/pyrokinesis-1.mp3'
-import { songs } from '@/static/songs'
 import LyricsComponent from '@/components/LyricsComponent.vue'
+import { songs } from '@/static/songs'
 
 const audio = new Audio(track)
 audio.loop = true
@@ -91,7 +91,6 @@ onMounted(() => {
         else if (!document.hidden && isPlaying.value) audio.play().catch(() => {})
     })
 })
-
 onUnmounted(() => {
     if (animationId) cancelAnimationFrame(animationId)
     audio.pause()
@@ -100,7 +99,7 @@ onUnmounted(() => {
 
 <template>
     <div
-        class="promo__wrapper"
+        class="promo-wrapper"
         :class="{
             'is-playing-mode': isPlaying && isBlurMode,
             'is-text-hidden': !isTextVisible,
@@ -116,6 +115,7 @@ onUnmounted(() => {
             :isTextVisible="isTextVisible"
             :bassValue="bassValue"
         />
+
         <div class="promo" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }">
             <div class="main__content">
                 <div class="text__content">
@@ -132,7 +132,7 @@ onUnmounted(() => {
 
                 <div class="promo__img-container">
                     <div
-                        class="img__glow-aura"
+                        class="img-glow-aura"
                         :style="{
                             transform: `scale(${1 + (bassValue / 255) * 0.7})`,
                             opacity: (bassValue / 255) * 0.8,
@@ -175,7 +175,8 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.promo__wrapper {
+/* Базовые стили */
+.promo-wrapper {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -290,7 +291,7 @@ onUnmounted(() => {
     will-change: transform;
 }
 
-.img__glow-aura {
+.img-glow-aura {
     position: absolute;
     width: clamp(150px, 30vw, 300px);
     height: clamp(150px, 30vw, 300px);
