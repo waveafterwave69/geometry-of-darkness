@@ -55,7 +55,7 @@ const activeLyric = computed(() => {
     max-width: min(90vw, 1200px);
     font-weight: 900;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--color-light);
     font-family: 'Inter', sans-serif;
     padding: 0 clamp(16px, 4vw, 40px);
     text-shadow:

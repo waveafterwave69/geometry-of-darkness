@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import track from '../audio/pyrokinesis-1.mp3'
 import LyricsComponent from '@/components/LyricsComponent.vue'
 import { songs } from '@/static/songs'
+import PlayerBar from '@/components/PlayerBar.vue'
 
 const audio = new Audio(track)
 audio.loop = true
 audio.volume = 0.4
+
+const changeAudio = (pos: number, duration: number) => {
+    audio.currentTime = pos * (duration || 0)
+}
 
 const isPlaying = ref(false)
 const imgScale = ref(1)
@@ -15,23 +20,6 @@ const currentTime = ref(0)
 const duration = ref(0)
 const isTextVisible = ref(true)
 const isBlurMode = ref(true)
-
-const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60)
-    const secs = Math.floor(time % 60)
-    return `${mins.toString().padStart(2, '00')}:${secs.toString().padStart(2, '00')}`
-}
-
-const progressPercent = computed(() =>
-    duration.value ? (currentTime.value / duration.value) * 100 : 0,
-)
-
-const seek = (e: MouseEvent) => {
-    const el = e.currentTarget as HTMLElement
-    const rect = el.getBoundingClientRect()
-    const pos = (e.clientX - rect.left) / rect.width
-    audio.currentTime = pos * (duration.value || 0)
-}
 
 let audioContext: AudioContext | null = null
 let analyser: AnalyserNode | null = null
@@ -154,23 +142,14 @@ onUnmounted(() => {
             </div>
         </div>
 
-        <div class="player-bar" v-if="isPlaying">
-            <div class="player-progress-container" @click="seek">
-                <div class="player-progress-bg">
-                    <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
-                </div>
-            </div>
-            <div class="player-info">
-                <span class="time">{{ formatTime(currentTime) }}</span>
-                <div class="track-block">
-                    <span class="track-name">pyrokinesis — притча во языцех</span>
-                </div>
-                <span class="time">{{ duration ? formatTime(duration) : '00:00' }}</span>
-            </div>
-            <button class="player__button" @click="toggleText">
-                <span>{{ isTextVisible ? 'Скрыть текст' : 'Показать текст' }}</span>
-            </button>
-        </div>
+        <player-bar
+            :duration="duration"
+            :currentTime="currentTime"
+            :isPlaying="isPlaying"
+            :changeAudio="changeAudio"
+            :toggleText="toggleText"
+            :isTextVisible="isTextVisible"
+        />
     </div>
 </template>
 
@@ -233,7 +212,7 @@ onUnmounted(() => {
     max-width: min(90vw, 1200px);
     font-weight: 900;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--color-light);
     font-family: 'Inter', sans-serif;
     padding: 0 clamp(16px, 4vw, 40px);
     text-shadow:
@@ -307,8 +286,8 @@ onUnmounted(() => {
 }
 
 .promo__button {
-    background: #fff;
-    color: #000;
+    background: var(--color-light);
+    color: var(--color-dark);
     border: none;
     padding: clamp(14px, 2vh, 18px) clamp(30px, 6vw, 50px);
     font-size: clamp(16px, 2vw, 18px);
@@ -340,8 +319,8 @@ onUnmounted(() => {
 
 .player__button {
     margin-top: clamp(8px, 1.5vh, 10px);
-    background: #fff;
-    color: #000;
+    background: var(--color-light);
+    color: var(--color-dark);
     border: none;
     padding: clamp(6px, 1.5vh, 8px) clamp(30px, 10vw, 50px);
     font-size: clamp(14px, 2vw, 16px);
@@ -378,7 +357,7 @@ onUnmounted(() => {
 
 .progress-fill {
     height: 100%;
-    background: #fff;
+    background: var(--color-light);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
     transition: width 0.1s linear;
 }
@@ -387,7 +366,7 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #fff;
+    color: var(--color-light);
     font-size: clamp(12px, 2vw, 14px);
     gap: 10px;
     flex-wrap: wrap;
@@ -424,21 +403,21 @@ onUnmounted(() => {
 /* Адаптивная типографика */
 .promo__title {
     font-size: clamp(42px, 8vw, 86px);
-    color: #fff;
+    color: var(--color-light);
     line-height: 1.1;
     word-break: break-word;
 }
 
 .promo__subtitle {
     font-size: clamp(18px, 3vw, 28px);
-    color: #fff;
+    color: var(--color-light);
     opacity: 0.6;
     margin-bottom: clamp(20px, 4vh, 40px);
 }
 
 .promo__text {
     font-size: clamp(16px, 2vw, 20px);
-    color: #fff;
+    color: var(--color-light);
     max-width: min(100%, 650px);
     opacity: 0.8;
     line-height: 1.6;
