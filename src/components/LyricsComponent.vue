@@ -67,7 +67,6 @@ const activeLyric = computed(() => {
     word-break: break-word;
 }
 
-/* Анимация lyric-zoom */
 .lyric-zoom-enter-active,
 .lyric-zoom-leave-active {
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);

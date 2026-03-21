@@ -13,9 +13,10 @@ interface Props {
 const props = defineProps<Props>()
 
 const formatTime = (time: number) => {
+    if (isNaN(time)) return '00:00'
     const mins = Math.floor(time / 60)
     const secs = Math.floor(time % 60)
-    return `${mins.toString().padStart(2, '00')}:${secs.toString().padStart(2, '00')}`
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
 const progressPercent = computed(() =>

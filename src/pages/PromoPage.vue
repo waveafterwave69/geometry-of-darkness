@@ -1,89 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
-import track from '../audio/pyrokinesis-1.mp3'
-import { songs } from '@/static/songs'
-import LyricsComponent from '@/components/LyricsComponent.vue'
-import PlayerBar from '@/components/PlayerBar.vue'
+import { useAudioPlay } from '@/composables/useAudioPlay'
 
-const audio = new Audio(track)
-audio.loop = true
-audio.volume = 0.4
+const { isPlaying, isTextVisible, bassValue, isBlurMode, imgScale, toggleAudio } = useAudioPlay()
 
-const isPlaying = ref(false)
-const imgScale = ref(1)
-const bassValue = ref(0)
-const currentTime = ref(0)
-const duration = ref(0)
-const isTextVisible = ref(true)
-const isBlurMode = ref(true)
-
-const changeAudio = (pos: number, duration: number) => {
-    audio.currentTime = pos * (duration || 0)
+const handleToggle = () => {
+    toggleAudio()
 }
-
-let audioContext: AudioContext | null = null
-let analyser: AnalyserNode | null = null
-let dataArray: Uint8Array | null = null
-let animationId: number | null = null
-
-const initAnalyser = () => {
-    if (audioContext) return
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-    audioContext = new AudioContextClass()
-    const source = audioContext.createMediaElementSource(audio)
-    analyser = audioContext.createAnalyser()
-    analyser.fftSize = 256
-    dataArray = new Uint8Array(analyser.frequencyBinCount)
-    source.connect(analyser)
-    analyser.connect(audioContext.destination)
-    animate()
-}
-
-const animate = () => {
-    if (!analyser || !dataArray) return
-    currentTime.value = audio.currentTime
-    if (!duration.value && audio.duration) duration.value = audio.duration
-
-    analyser.getByteFrequencyData(dataArray as any)
-    const currentBass = dataArray[0] ?? 0
-    bassValue.value = currentBass
-    const targetScale = 1 + (currentBass / 255) * 0.1
-    imgScale.value += (targetScale - imgScale.value) * 0.2
-    animationId = requestAnimationFrame(animate)
-}
-
-const toggleAudio = () => {
-    if (!audioContext) initAnalyser()
-    if (audioContext?.state === 'suspended') audioContext.resume().catch(() => {})
-    if (isPlaying.value) {
-        audio.pause()
-        isPlaying.value = false
-    } else {
-        audio.play().catch(() => {})
-        isPlaying.value = true
-    }
-}
-
-const toggleText = () => {
-    isTextVisible.value = !isTextVisible.value
-    if (!isTextVisible.value) {
-        isBlurMode.value = false
-    } else {
-        isBlurMode.value = true
-    }
-}
-
-onMounted(() => {
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden && isPlaying.value) audio.pause()
-        else if (!document.hidden && isPlaying.value) audio.play().catch(() => {})
-    })
-})
-
-onUnmounted(() => {
-    if (animationId) cancelAnimationFrame(animationId)
-    audio.pause()
-})
 </script>
 
 <template>
@@ -96,23 +18,6 @@ onUnmounted(() => {
     >
         <div class="screen-glow" :style="{ opacity: (bassValue / 255) * 0.6 }"></div>
 
-        <lyrics-component
-            v-if="songs[0]"
-            :lyrics="songs[0].text"
-            :isPlaying="isPlaying"
-            :currentTime="currentTime"
-            :isTextVisible="isTextVisible"
-            :bassValue="bassValue"
-        />
-
-        <player-bar
-            :duration="duration"
-            :currentTime="currentTime"
-            :isPlaying="isPlaying"
-            :changeAudio="changeAudio"
-            :toggleText="toggleText"
-            :isTextVisible="isTextVisible"
-        />
         <div class="promo" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }">
             <div class="main__content">
                 <div class="text__content">
@@ -145,7 +50,7 @@ onUnmounted(() => {
             </div>
 
             <div class="button-center">
-                <button class="promo__button" @click="toggleAudio">
+                <button class="promo__button" @click="handleToggle">
                     <span>{{ isPlaying ? 'Выключить' : 'Слушать' }}</span>
                 </button>
             </div>
