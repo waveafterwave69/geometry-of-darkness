@@ -1,24 +1,25 @@
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import track from '../audio/pyrokinesis-1.mp3'
+import { defineStore } from 'pinia'
 
-const audio = new Audio(track)
-audio.loop = true
-audio.volume = 0.4
+export const useAudioStore = defineStore('audio', () => {
+    const audio = new Audio(track)
+    audio.loop = true
+    audio.volume = 0.4
 
-const isPlaying = ref(false)
-const currentTime = ref(0)
-const duration = ref(0)
-const bassValue = ref(0)
-const imgScale = ref(1)
-const isTextVisible = ref(true)
-const isBlurMode = ref(true)
+    let audioContext: AudioContext | null = null
+    let analyser: AnalyserNode | null = null
+    let dataArray: Uint8Array | any = null
+    let animationId: number | null = null
 
-let audioContext: AudioContext | null = null
-let analyser: AnalyserNode | null = null
-let dataArray: Uint8Array | any = null
-let animationId: number | null = null
+    const isPlaying = ref(false)
+    const currentTime = ref(0)
+    const duration = ref(0)
+    const bassValue = ref(0)
+    const imgScale = ref(1)
+    const isTextVisible = ref(true)
+    const isBlurMode = ref(true)
 
-export const useAudioPlay = () => {
     const initAnalyser = () => {
         if (audioContext) return
 
@@ -83,31 +84,10 @@ export const useAudioPlay = () => {
         isBlurMode.value = isTextVisible.value
     }
 
-    const stopAudioFull = () => {
-        audio.pause()
-        audio.currentTime = 0
-        isPlaying.value = false
-        if (animationId) cancelAnimationFrame(animationId)
-    }
-
-    const handleVisibility = () => {
-        if (document.hidden && isPlaying.value) audio.pause()
-        else if (!document.hidden && isPlaying.value) audio.play().catch(() => {})
-    }
-
-    onMounted(() => {
-        window.addEventListener('visibilitychange', handleVisibility)
-
-        window.addEventListener('beforeunload', stopAudioFull)
-
-        if (isPlaying.value && !animationId) animate()
-    })
-
-    onUnmounted(() => {
-        window.removeEventListener('visibilitychange', handleVisibility)
-    })
-
     return {
+        audio,
+        animationId,
+        animate,
         isPlaying,
         currentTime,
         duration,
@@ -121,4 +101,4 @@ export const useAudioPlay = () => {
         toggleText,
         initAnalyser,
     }
-}
+})

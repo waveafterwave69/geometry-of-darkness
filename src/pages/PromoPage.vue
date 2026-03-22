@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAudioPlay } from '@/composables/useAudioPlay'
+import { useAudioStore } from '@/stores/audioStore'
 
-const { isPlaying, isTextVisible, bassValue, isBlurMode, imgScale, toggleAudio } = useAudioPlay()
+const audioStore = useAudioStore()
 
 const handleToggle = () => {
-    toggleAudio()
+    audioStore.toggleAudio()
 }
 </script>
 
@@ -12,11 +12,11 @@ const handleToggle = () => {
     <div
         class="promo__wrapper"
         :class="{
-            'is-playing-mode': isPlaying && isBlurMode,
-            'is-text-hidden': !isTextVisible,
+            'is-playing-mode': audioStore.isPlaying && audioStore.isBlurMode,
+            'is-text-hidden': !audioStore.isTextVisible,
         }"
     >
-        <div class="screen-glow" :style="{ opacity: (bassValue / 255) * 0.6 }"></div>
+        <div class="screen-glow" :style="{ opacity: (audioStore.bassValue / 255) * 0.6 }"></div>
 
         <div class="promo" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }">
             <div class="main__content">
@@ -36,22 +36,22 @@ const handleToggle = () => {
                     <div
                         class="img__glow-aura"
                         :style="{
-                            transform: `scale(${1 + (bassValue / 255) * 0.7})`,
-                            opacity: (bassValue / 255) * 0.8,
+                            transform: `scale(${1 + (audioStore.bassValue / 255) * 0.7})`,
+                            opacity: (audioStore.bassValue / 255) * 0.8,
                         }"
                     ></div>
                     <img
                         src="../img/logo.png"
                         alt="Logo"
                         class="promo__img"
-                        :style="{ transform: `scale(${imgScale})` }"
+                        :style="{ transform: `scale(${audioStore.imgScale})` }"
                     />
                 </div>
             </div>
 
             <div class="button-center">
                 <button class="promo__button" @click="handleToggle">
-                    <span>{{ isPlaying ? 'Выключить' : 'Слушать' }}</span>
+                    <span>{{ audioStore.isPlaying ? 'Выключить' : 'Слушать' }}</span>
                 </button>
             </div>
         </div>
