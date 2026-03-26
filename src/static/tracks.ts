@@ -1,6 +1,9 @@
-export const songs = [
+import track from '../audio/pyrokinesis-1.mp3'
+
+export const tracks = [
     {
         name: 'притча во языцех',
+        src: track,
         text: [
             { time: 11, text: 'Не ликую, не тоскую' },
             { time: 13, text: 'Чтоб художнику освоить мастерскую' },

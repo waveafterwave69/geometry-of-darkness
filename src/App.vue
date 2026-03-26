@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { songs } from '@/static/songs'
 import LyricsComponent from '@/components/LyricsComponent.vue'
 import PlayerBar from '@/components/PlayerBar.vue'
 import { useAudioStore } from './stores/audioStore'
 import { onMounted, onUnmounted } from 'vue'
+import { useTrackStore } from './stores/trackStore'
 
 const audioStore = useAudioStore()
+const trackStore = useTrackStore()
 
 const stopAudioFull = () => {
     audioStore.audio.pause()
@@ -36,8 +37,8 @@ onUnmounted(() => {
     <main class="container">
         <RouterView />
         <LyricsComponent
-            v-if="songs[0] && audioStore.isPlaying"
-            :lyrics="songs[0].text"
+            v-if="trackStore.track && audioStore.isPlaying"
+            :lyrics="trackStore.track.text"
             :isPlaying="audioStore.isPlaying"
             :currentTime="audioStore.currentTime"
             :isTextVisible="audioStore.isTextVisible"

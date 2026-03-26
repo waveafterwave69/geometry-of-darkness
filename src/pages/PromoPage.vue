@@ -1,9 +1,21 @@
 <script setup lang="ts">
+import { tracks } from '@/static/tracks'
 import { useAudioStore } from '@/stores/audioStore'
+import { useTrackStore } from '@/stores/trackStore'
+import { nextTick } from 'vue'
 
 const audioStore = useAudioStore()
+const trackStore = useTrackStore()
 
-const handleToggle = () => {
+const handleToggle = async () => {
+    const currentTrackData = tracks[0]
+    if (!currentTrackData) return
+
+    if (trackStore.track?.src !== currentTrackData.src) {
+        trackStore.changeTrack(currentTrackData)
+        await nextTick()
+    }
+
     audioStore.toggleAudio()
 }
 </script>
@@ -51,7 +63,11 @@ const handleToggle = () => {
 
             <div class="button-center">
                 <button class="promo__button" @click="handleToggle">
-                    <span>{{ audioStore.isPlaying ? 'Выключить' : 'Слушать' }}</span>
+                    <span>{{
+                        audioStore.isPlaying
+                            ? `Выключить трек`
+                            : `Слушать трек "${tracks[0]?.name}"`
+                    }}</span>
                 </button>
             </div>
         </div>
@@ -128,7 +144,6 @@ const handleToggle = () => {
     word-break: break-word;
 }
 
-/* Анимация lyric-zoom */
 .lyric-zoom-enter-active,
 .lyric-zoom-leave-active {
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);

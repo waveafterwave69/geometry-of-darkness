@@ -1,9 +1,11 @@
-import { ref } from 'vue'
-import track from '../audio/pyrokinesis-1.mp3'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+import { useTrackStore } from './trackStore'
 
 export const useAudioStore = defineStore('audio', () => {
-    const audio = new Audio(track)
+    const trackStore = useTrackStore()
+
+    const audio = new Audio()
     audio.loop = true
     audio.volume = 0.4
 
@@ -19,6 +21,17 @@ export const useAudioStore = defineStore('audio', () => {
     const imgScale = ref(1)
     const isTextVisible = ref(true)
     const isBlurMode = ref(true)
+
+    watch(
+        () => trackStore.track,
+        (newTrack) => {
+            if (newTrack?.src) {
+                audio.src = newTrack.src
+                audio.load()
+            }
+        },
+        { immediate: true },
+    )
 
     const initAnalyser = () => {
         if (audioContext) return
